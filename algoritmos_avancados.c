@@ -1,4 +1,58 @@
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+typedef struct Sala {
+    char nome[50];
+    struct Sala *esquerda;
+    struct Sala *direita;
+} Sala;
+
+// Cria uma sala com nome e ponteiros nulos
+Sala* criarSala(const char *nome) {
+    Sala *nova = (Sala*) malloc(sizeof(Sala));
+    if (!nova) {
+        printf("Erro ao alocar memória!\n");
+        exit(1);
+    }
+    strcpy(nova->nome, nome);
+    nova->esquerda = NULL;
+    nova->direita = NULL;
+    return nova;
+}
+
+// Exploração interativa
+void explorarSalas(Sala *atual) {
+    char opcao;
+
+    while (atual != NULL) {
+        printf("\nVocê está na sala: %s\n", atual->nome);
+
+        // Se chegou a um nó-folha, fim do caminho
+        if (atual->esquerda == NULL && atual->direita == NULL) {
+            printf("Fim do caminho! Você chegou ao último cômodo.\n");
+            return;
+        }
+
+        printf("Escolha seu caminho:\n");
+        printf("  e → ir para a esquerda\n");
+        printf("  d → ir para a direita\n");
+        printf("  s → sair da exploração\n");
+        printf("Opção: ");
+        scanf(" %c", &opcao);
+
+        if (opcao == 'e') {
+            atual = atual->esquerda;
+        } else if (opcao == 'd') {
+            atual = atual->direita;
+        } else if (opcao == 's') {
+            printf("Exploração encerrada.\n");
+            return;
+        } else {
+            printf("Opção inválida! Tente novamente.\n");
+        }
+    }
+}
 
 // Desafio Detective Quest
 // Tema 4 - Árvores e Tabela Hash
@@ -41,6 +95,27 @@ int main() {
     // - Para hashing simples, pode usar soma dos valores ASCII do nome ou primeira letra.
     // - Em caso de colisão, use lista encadeada para tratar.
     // - Modularize com funções como inicializarHash(), buscarSuspeito(), listarAssociacoes().
+
+    // Construção estática da árvore binária da mansão
+    Sala *hall = criarSala("Hall de Entrada");
+    Sala *biblioteca = criarSala("Biblioteca");
+    Sala *cozinha = criarSala("Cozinha");
+    Sala *escritorio = criarSala("Escritório");
+    Sala *porao = criarSala("Porão");
+    Sala *jardim = criarSala("Jardim");
+
+    // Ligações da árvore
+    hall->esquerda = biblioteca;
+    hall->direita = cozinha;
+
+    biblioteca->esquerda = escritorio;
+    biblioteca->direita = porao;
+
+    cozinha->esquerda = jardim;
+    cozinha->direita = NULL; // caminho termina aqui
+
+    // Início da exploração
+    explorarSalas(hall);
 
     return 0;
 }
